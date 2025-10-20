@@ -1,9 +1,11 @@
 let song;
 let stars = [];
+let silverstars = [];
 let fft;
 let amp;
 let level;
 let starsImg; 
+let silverImg;
 let angle = 0;
 let time = 0;
 let baseRadius;
@@ -17,16 +19,19 @@ function preload() {
   song = loadSound('assets/Midnight.mp3');
   //load images
   starsImg = loadImage('assets/stars.png');
+  silverImg = loadImage('assets/silverstar.png');
+
 }
 
 function setup() {
   createCanvas(1000, 1000);
   amp= new p5.Amplitude();
   amp.setInput(song);
+  fft = new p5.FFT();
   baseRadius = width/2.3;
 
-//40 stars generated
-  for (let i = 0; i < 40; i++) {
+//30 gold stars generated
+  for (let i = 0; i < 30; i++) {
     stars.push({
       x: random(width),
       y: random(height),
@@ -37,8 +42,23 @@ function setup() {
       vx: random(-0.5, 0.5),
       vy: random(-0.5, 0.5)
     });
+}
+
+    //30 silver stars generated 
+    for (let i = 0; i < 30; i++) {
+    silverstars.push({
+      x1: random(width),
+      y1: random(height),
+      size1: random(50, 150),
+      angle1: random(TWO_PI),
+      rotationSpeed1: random(-0.01, 0.01),
+      //velocities for x and y
+      vx1: random(-0.5, 0.5),
+      vy1: random(-0.5, 0.5)
+    });
   }
 }
+
 
 function draw() {
 background(39, 53, 81);
@@ -63,11 +83,14 @@ background(39, 53, 81);
   time += 0.02;
 
  if (song.isPlaying()) {
+    fft.analyze();
    level = amp.getLevel();
+   let bass = fft.getEnergy('bass');
    starSize = map(level, 0, 1, 30, 250);
+   silverstarSize = map(bass, 0, 255, -100, 100);
 
-   //for loop to make 40 stars randomly move on canvas
-   for (let i = 0; i < 40; i++) {
+   //for loop to make 30 gold stars randomly move on canvas
+   for (let i = 0; i < 30; i++) {
      stars[i].x += stars[i].vx;
      stars[i].y += stars[i].vy;
 
@@ -89,6 +112,30 @@ background(39, 53, 81);
    //the star angles for rotation
     stars[i].angle += stars[i].rotationSpeed;
  }
+
+ //for loop to make 30 silver stars randomly move on canvas
+   for (let i = 0; i < 30; i++) {
+     silverstars[i].x1 += silverstars[i].vx1;
+     silverstars[i].y1 += silverstars[i].vy1;
+
+      // edge collision detection (not very exact since the stars vary in size but it works)
+      if (silverstars[i].x1 < -silverstarSize) silverstars[i].x1 = width + silverstarSize;
+      if (silverstars[i].x1 > width + silverstarSize) silverstars[i].x1 = -silverstarSize;
+      if (silverstars[i].y1 < -silverstarSize) silverstars[i].y1 = height + silverstarSize;
+      if (silverstars[i].y1 > height + silverstarSize) silverstars[i].y1 = -silverstarSize;
+
+      let x1 = silverstars[i].x1;
+      let y1 = silverstars[i].y1;
+
+     push();
+     translate(x1, y1);
+     rotate(silverstars[i].angle1);
+     // Offset x and y by half the star size to center the image
+     image(silverImg, -silverstarSize/2, -silverstarSize/2, silverstarSize, silverstarSize);
+     pop();
+   //the star angles for rotation
+    silverstars[i].angle1 += silverstars[i].rotationSpeed1;
+}
 }
 }
 //if mouse is pressed, start or stop clip
