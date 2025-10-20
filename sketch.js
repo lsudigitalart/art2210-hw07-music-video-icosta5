@@ -74,7 +74,7 @@ background(39, 53, 81);
   // Draw gradient using concentric circles for loop
   for (let r = radius; r > 0; r -= 2) {
     let inter = map(r, 0, radius, 0, 1);
-    let c = lerpColor(color(87, 129, 158), color(39, 53, 81), inter); // light blue to background color
+    let c = lerpColor(color(87, 129, 158), color(39, 53, 81), inter); // light blue to background color ombre circle
     noStroke();
     fill(c);
     circle(centerX, centerY, r * 2);
